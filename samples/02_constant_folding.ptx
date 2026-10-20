@@ -1,0 +1,53 @@
+// ==============================================================================
+// PTXScope Sample 02: Constant Folding & Type-Aware Evaluation
+//
+// Compiler Concepts Demonstrated:
+// - Compile-time integer evaluation of arithmetic expressions with immediate operands.
+// - Strict signed vs unsigned bit-width truncation.
+// - Preservation of floating-point arithmetic (floating point operations are
+//   conservatively NOT folded under integer rules to preserve IEEE-754 rounding).
+//
+// Expected Parser Behavior:
+// - Clean parse with 0 errors.
+//
+// Expected Diagnostics:
+// - Static analyzer notes foldable operations as optimization candidates.
+//
+// Expected Optimization Results:
+// - 'add.u32 %r1, 1024, 2048;' -> 'mov.u32 %r1, 3072;'
+// - 'mul.lo.u32 %r2, 16, 8;'    -> 'mov.u32 %r2, 128;'
+// - 'sub.s32 %r3, 50, 100;'     -> 'mov.s32 %r3, -50;'
+// - 'add.f32 %f1, 1.5, 2.5;' is strictly preserved without integer truncation.
+// ==============================================================================
+
+.version 7.0
+.target sm_70
+.address_size 64
+
+.entry test_const_fold(
+    .param .u64 out_ptr
+) {
+    .reg .u64 %rd1;
+    .reg .u32 %r<5>;
+    .reg .s32 %s<5>;
+    .reg .f32 %f<5>;
+
+    ld.param.u64 %rd1, [out_ptr];
+
+    // Foldable 32-bit unsigned additions and multiplications
+    add.u32 %r1, 1024, 2048;
+    mul.lo.u32 %r2, 16, 8;
+
+    // Foldable 32-bit signed subtraction
+    sub.s32 %s1, 50, 100;
+
+    // Floating-point operation (must be preserved!)
+    add.f32 %f1, 1.5, 2.5;
+
+    // Use folded results to write to memory
+    add.u32 %r3, %r1, %r2;
+    st.global.u32 [%rd1], %r3;
+    st.global.s32 [%rd1+4], %s1;
+
+    ret;
+}

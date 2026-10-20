@@ -1,0 +1,50 @@
+// ==============================================================================
+// PTXScope Sample 06: Load / Store Memory Access Patterns
+//
+// Compiler Concepts Demonstrated:
+// - Explicit memory spaces: .param, .global, .shared.
+// - Register displacement addressing [%rd1 + offset].
+// - Intra-warp barrier synchronization (bar.sync).
+// - Conservative aliasing and memory fence behavior.
+//
+// Expected Parser Behavior:
+// - Parses cleanly with 0 syntax errors.
+//
+// Expected Diagnostics:
+// - Static analysis notes load/store dependencies and memory state spaces.
+//
+// Expected Optimization Results:
+// - Memory barriers (bar.sync) and stores (st.global) are preserved strictly.
+// ==============================================================================
+
+.version 7.0
+.target sm_70
+.address_size 64
+
+.entry test_memory_pipeline(
+    .param .u64 in_ptr,
+    .param .u64 out_ptr
+) {
+    .reg .u64 %rd_in, %rd_out;
+    .reg .u32 %val0, %val1, %val2, %sum;
+
+    ld.param.u64 %rd_in, [in_ptr];
+    ld.param.u64 %rd_out, [out_ptr];
+
+    // Pipelined consecutive loads from input buffer with byte offsets
+    ld.global.u32 %val0, [%rd_in];
+    ld.global.u32 %val1, [%rd_in+4];
+    ld.global.u32 %val2, [%rd_in+8];
+
+    // Compute aggregate
+    add.u32 %sum, %val0, %val1;
+    add.u32 %sum, %sum, %val2;
+
+    // Synchronize warp threads
+    bar.sync 0;
+
+    // Write back combined result
+    st.global.u32 [%rd_out], %sum;
+
+    ret;
+}

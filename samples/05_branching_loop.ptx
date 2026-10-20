@@ -1,0 +1,50 @@
+// ==============================================================================
+// PTXScope Sample 05: Branching & Control Flow Loop
+//
+// Compiler Concepts Demonstrated:
+// - Multi-block control flow graph (CFG) construction with loops and back-edges.
+// - Conditional branching with predicate evaluation (setp.lt.s32, @p0 bra).
+// - Induction variable stepping (%i = %i + 1).
+// - Loop accumulation and exit condition checking.
+//
+// Expected Parser Behavior:
+// - Parses cleanly into distinct basic blocks: entry, loop_header, loop_body, exit_block.
+//
+// Expected Diagnostics:
+// - Normal CFG with back-edges; no unreachability errors.
+//
+// Expected Optimization Results:
+// - Graph topology preserved; loop structure maintained.
+// ==============================================================================
+
+.version 7.0
+.target sm_70
+.address_size 64
+
+.entry test_loop(
+    .param .u64 out_ptr,
+    .param .s32 n_iterations
+) {
+    .reg .u64 %rd1;
+    .reg .s32 %n, %i, %sum;
+    .reg .pred %p_exit;
+
+    ld.param.u64 %rd1, [out_ptr];
+    ld.param.s32 %n, [n_iterations];
+
+    mov.s32 %i, 0;
+    mov.s32 %sum, 0;
+
+loop_header:
+    setp.ge.s32 %p_exit, %i, %n;
+    @%p_exit bra loop_exit;
+
+loop_body:
+    add.s32 %sum, %sum, %i;
+    add.s32 %i, %i, 1;
+    bra loop_header;
+
+loop_exit:
+    st.global.s32 [%rd1], %sum;
+    ret;
+}

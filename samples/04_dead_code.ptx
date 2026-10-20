@@ -1,0 +1,52 @@
+// ==============================================================================
+// PTXScope Sample 04: Dead Code Elimination & Unreachable Block Pruning
+//
+// Compiler Concepts Demonstrated:
+// - Control flow graph reachability analysis.
+// - Unreachable basic block detection (blocks placed after an unconditional ret/exit/bra).
+// - Dead register assignment detection (register assigned but never consumed).
+// - Strict safety: Side-effecting stores (st.global) and memory barriers MUST never
+//   be eliminated even if preceding or succeeding register writes are dead.
+//
+// Expected Parser Behavior:
+// - Clean parse.
+//
+// Expected Diagnostics:
+// - Warning W002_UNREACHABLE_CODE reported for basic block 'dead_unreachable_block'.
+// - Warning W001_UNUSED_REGISTER reported for register %r_unused.
+//
+// Expected Optimization Results:
+// - The dead basic block is excised from the module.
+// - The dead register assignment to %r_unused is eliminated.
+// - The store instruction 'st.global.u32 [%rd1], 777;' is strictly preserved.
+// ==============================================================================
+
+.version 7.0
+.target sm_70
+.address_size 64
+
+.entry test_dead_code(
+    .param .u64 out_ptr
+) {
+    .reg .u64 %rd1;
+    .reg .u32 %r_live;
+    .reg .u32 %r_unused;
+    .reg .u32 %r_dead_block;
+
+    ld.param.u64 %rd1, [out_ptr];
+
+    // Dead assignment to %r_unused
+    mov.u32 %r_unused, 99999;
+
+    // Live assignment used in store
+    mov.u32 %r_live, 777;
+    st.global.u32 [%rd1], %r_live;
+
+    ret;
+
+dead_unreachable_block:
+    // This code can never be reached from kernel entry
+    mov.u32 %r_dead_block, 1234;
+    add.u32 %r_dead_block, %r_dead_block, 1;
+    ret;
+}

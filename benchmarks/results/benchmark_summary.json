@@ -1,0 +1,104 @@
+{
+  "environment": {
+    "os": "Windows",
+    "release": "11",
+    "arch": "AMD64",
+    "python": "3.12.10",
+    "engine": "C:\\Users\\mahii\\.gemini\\antigravity\\scratch\\PTXScope\\build\\engine\\ptxscope.exe",
+    "timestamp": "2026-10-20T09:54:42Z"
+  },
+  "samples": {
+    "01_vector_add.ptx": {
+      "mean_wall_ms": 41.43,
+      "std_wall_ms": 11.97,
+      "engine_internal_ms": 4.59,
+      "initial_instructions": 19,
+      "optimized_instructions": 17,
+      "transformations": 2,
+      "basic_blocks": 2
+    },
+    "02_constant_folding.ptx": {
+      "mean_wall_ms": 45.05,
+      "std_wall_ms": 12.89,
+      "engine_internal_ms": 5.61,
+      "initial_instructions": 9,
+      "optimized_instructions": 8,
+      "transformations": 4,
+      "basic_blocks": 1
+    },
+    "03_redundant_moves.ptx": {
+      "mean_wall_ms": 44.17,
+      "std_wall_ms": 13.32,
+      "engine_internal_ms": 1.67,
+      "initial_instructions": 7,
+      "optimized_instructions": 6,
+      "transformations": 3,
+      "basic_blocks": 1
+    },
+    "04_dead_code.ptx": {
+      "mean_wall_ms": 31.36,
+      "std_wall_ms": 8.69,
+      "engine_internal_ms": 4.35,
+      "initial_instructions": 8,
+      "optimized_instructions": 4,
+      "transformations": 2,
+      "basic_blocks": 1
+    },
+    "05_branching_loop.ptx": {
+      "mean_wall_ms": 32.41,
+      "std_wall_ms": 12.18,
+      "engine_internal_ms": 3.06,
+      "initial_instructions": 11,
+      "optimized_instructions": 11,
+      "transformations": 0,
+      "basic_blocks": 4
+    },
+    "06_load_store.ptx": {
+      "mean_wall_ms": 40.43,
+      "std_wall_ms": 9.67,
+      "engine_internal_ms": 1.94,
+      "initial_instructions": 10,
+      "optimized_instructions": 10,
+      "transformations": 0,
+      "basic_blocks": 1
+    }
+  },
+  "synthetic": {
+    "synthetic_scale_50": {
+      "mean_wall_ms": 46.27,
+      "std_wall_ms": 17.68,
+      "engine_internal_ms": 7.46,
+      "initial_instructions": 54,
+      "optimized_instructions": 3,
+      "transformations": 76,
+      "basic_blocks": 1
+    },
+    "synthetic_scale_200": {
+      "mean_wall_ms": 81.02,
+      "std_wall_ms": 25.09,
+      "engine_internal_ms": 7.82,
+      "initial_instructions": 204,
+      "optimized_instructions": 4,
+      "transformations": 300,
+      "basic_blocks": 1
+    },
+    "synthetic_scale_500": {
+      "mean_wall_ms": 96.56,
+      "std_wall_ms": 17.82,
+      "engine_internal_ms": 45.9,
+      "initial_instructions": 504,
+      "optimized_instructions": 4,
+      "transformations": 750,
+      "basic_blocks": 1
+    },
+    "synthetic_scale_1000": {
+      "mean_wall_ms": 211.03,
+      "std_wall_ms": 94.41,
+      "engine_internal_ms": 34.76,
+      "initial_instructions": 1004,
+      "optimized_instructions": 4,
+      "transformations": 1500,
+      "basic_blocks": 1
+    }
+  }
+}
